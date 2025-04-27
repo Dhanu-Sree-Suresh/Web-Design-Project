@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - {{ quiz.title }}</title>
+    <style>
+        body {
+            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dddddd;
+        }
+        
+        .quiz-title {
+            font-size: 1.5rem;
+            color: #007BFF;
+            margin: 0;
+        }
+        
+        .timer {
+            background-color: #FFC107;
+            color: #333333;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #007BFF;
+            width: {{ (current_question_index / total_questions * 100) }}%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #6c757d;
+        }
+        
+        .question-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px #0000001a;
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .option input {
+            margin-right: 0.8rem;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #007BFF;
+            color: #007BFF;
+        }
+        
+        .btn-outline:hover {
+            background: #007BFF;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: #007BFF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056B3;
+        }
+        
+        .btn-success {
+            background: #28A745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-header">
+            <h2 class="quiz-title">{{ quiz.title }}</h2>
+            <div class="timer" id="quizTimer">Time Left: 30:00</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="progress-text">
+                Question {{ current_question_index + 1 }} of {{ total_questions }}
+            </div>
+        </div>
+        
+        <form action="/quiz/{{ quiz.id }}/attempt" method="POST">
+            <div class="question-card">
+                <div class="question-text">{{ question.ques }}</div>
+                
+                <div class="options">
+                    {% for option in [question.opt1, question.op2, question.op3, question.opt4] %}
+                        <label class="option">
+                            <input type="radio" name="answer" value="{{ loop.index }}" required>
+                            {{ option }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="navigation">
+                {% if current_question_index > 0 %}
+                    <a href="/quiz/{{ quiz.id }}/question/{{ current_question_index - 1 }}" 
+                       class="btn btn-outline">Previous</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+                
+                {% if current_question_index < total_questions - 1 %}
+                    <button type="submit" class="btn btn-primary">Next</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success">Submit Quiz</button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let timeLeft = {{ time_left_seconds }};
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('quizTimer').textContent = 
+                `Time Left: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                document.querySelector('form').submit();
+            } else {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+        updateTimer();
+    </script>
+</body>
+</html>

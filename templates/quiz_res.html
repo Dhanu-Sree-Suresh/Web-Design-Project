@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Quiz Results</title>
+    <style>
+        body {
+            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px #0000001a;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        h1 {
+            color: #007BFF;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-meta {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-summary {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #007BFF;
+            margin: 1rem 0;
+        }
+        
+        .score-message {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px #0000001a;
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-result {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eeeeee;
+        }
+        
+        .question-result:last-child {
+            border-bottom: none;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .option {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .correct {
+            background-color: #d4edda;
+            border-left: 4px solid #28A745;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da;
+            border-left: 4px solid #DC3545;
+        }
+        
+        .selected {
+            font-weight: bold;
+        }
+        
+        .feedback {
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: #007BFF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056B3;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #007BFF;
+            color: #007BFF;
+        }
+        
+        .btn-outline:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quiz Master</div>
+            <nav>
+                <ul>
+                    <li><a href="/user/dashboard">Dashboard</a></li>
+                    <li><a href="/user/quizzes">Quizzes</a></li>
+                    <li><a href="/user/scores">My Scores</a></li>
+                    <li><a href="/user/scores/summary">Summary</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1>Quiz Results</h1>
+        <div class="quiz-meta">
+            {{ quiz.title }} • {{ quiz.chapter.subject.name }} • {{ quiz.chapter.name }}
+        </div>
+        
+        <div class="result-summary">
+            <div class="score-display">{{ score }}%</div>
+            <div class="score-message">
+                {% if score >= 80 %}
+                    Excellent work! You've mastered this material.
+                {% elif score >= 60 %}
+                    Good job! You have a solid understanding.
+                {% elif score >= 40 %}
+                    Keep practicing! You're getting there.
+                {% else %}
+                    Review the material and try again.
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Question Breakdown</h2>
+            {% for question in questions %}
+            <div class="question-result">
+                <div class="question-text">{{ question.text }}</div>
+                
+                {% for option in question.options %}
+                <div class="option 
+                    {% if option.is_correct %}correct
+                    {% elif option.is_selected and not option.is_correct %}incorrect{% endif %}">
+                    {% if option.is_selected %}<span class="selected">✓ Your answer: {% endif %}
+                    {{ option.text }}
+                    {% if option.is_selected %}</span>{% endif %}
+                    
+                    {% if option.is_correct and not option.is_selected %}
+                        <span class="feedback">(Correct answer)</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <a href="/user/quizzes" class="btn btn-primary">Try Another Quiz</a>
+            <a href="/user/scores" class="btn btn-outline">View All Scores</a>
+        </div>
+    </div>
+</body>
+</html>

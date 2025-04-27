@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master - Available Quizzes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px #0000001a;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        h1 {
+            color: #007BFF;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-bar {
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 95%;
+            padding: 0.8rem;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+        
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .quiz-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px #0000001a;
+            position: relative;
+        }
+        
+        .quiz-card h3 {
+            margin-top: 0;
+            color: #007BFF;
+        }
+        
+        .quiz-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-card p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #0056B3;
+        }
+        
+        .btn-info {
+            background-color: #6c757d;
+        }
+        
+        .btn-info:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .btn-disabled:hover {
+            background-color: #5a6268;
+        }
+        
+        .quiz-info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #00000080;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            .filter-options {
+                flex-direction: column;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quiz Master</div>
+            <nav>
+                <ul>
+                    <li><a href="/user/dashboard">Dashboard</a></li>
+                    <li><a href="/user/quizzes">Quizzes</a></li>
+                    <li><a href="/user/scores">My Scores</a></li>
+                    <li><a href="/user/scores/summary">Summary</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1>Available Quizzes</h1>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search quizzes...">
+        </div>
+        
+        <div class="filter-options">
+            <select class="filter-select">
+                <option>All Subjects</option>
+                {% for subject in subjects %}
+                    <option>{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <select class="filter-select">
+                <option>All Chapters</option>
+                {% for chapter in chapters %}
+                    <option>{{ chapter.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="quiz-grid">
+            {% for quiz in quizzes %}
+                <div class="quiz-card">
+                    <h3>{{ quiz.title }}</h3>
+                    <div class="quiz-meta">
+                        {{ quiz.chapter.subject.name }} • {{ quiz.chapter.name }}
+                    </div>
+                    <p>{{ quiz.remarks or 'Test your knowledge on this topic' }}</p>
+                    
+                    <div class="quiz-actions">
+                        <button class="btn btn-info quiz-info-btn" 
+                                data-quiz-id="{{ quiz.q_id }}"
+                                data-title="{{ quiz.title }}"
+                                data-subject="{{ quiz.chapter.subject.name }}"
+                                data-chapter="{{ quiz.chapter.name }}"
+                                data-duration="{{ quiz.time_duration }}"
+                                data-questions="{{ quiz.questions_count }}"
+                                data-date="{{ quiz.date_of_quiz }}"
+                                data-remarks="{{ quiz.remarks }}">
+                            Quiz Info
+                        </button>
+                        
+                        {% if quiz.is_available %}
+                            <a href="/quiz/{{ quiz.q_id }}/start" class="btn">Start Quiz</a>
+                        {% else %}
+                            <span class="btn btn-disabled">Available {{ quiz.date_of_quiz }}</span>
+                            <a href="/quiz/{{ quiz.q_id }}/start" class="btn">Attempt Quiz</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="quiz-info-modal" id="quizInfoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalQuizTitle">Quiz Title</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Subject:</span>
+                    <span id="modalSubject">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Chapter:</span>
+                    <span id="modalChapter">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Duration:</span>
+                    <span id="modalDuration">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Questions:</span>
+                    <span id="modalQuestions">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Available Date:</span>
+                    <span id="modalDate">-</span>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Description:</span>
+                <p id="modalRemarks">No additional information provided.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('quizInfoModal');
+        const closeBtn = document.getElementById('closeModal');
+        const infoBtns = document.querySelectorAll('.quiz-info-btn');
+        
+        infoBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('modalQuizTitle').textContent = this.dataset.title;
+                document.getElementById('modalSubject').textContent = this.dataset.subject;
+                document.getElementById('modalChapter').textContent = this.dataset.chapter;
+                document.getElementById('modalDuration').textContent = this.dataset.duration;
+                document.getElementById('modalQuestions').textContent = this.dataset.questions;
+                document.getElementById('modalDate').textContent = this.dataset.date;
+                document.getElementById('modalRemarks').textContent = 
+                    this.dataset.remarks || 'No additional information provided.';
+                
+                modal.style.display = 'flex';
+            });
+        });
+        
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
